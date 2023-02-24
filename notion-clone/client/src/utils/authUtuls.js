@@ -10,7 +10,6 @@ export const authUtuls = {
       const res = await authApi.verifytoken();
       return res.user;
     } catch (err) {
-      console.log(err);
       return false;
     }
   },

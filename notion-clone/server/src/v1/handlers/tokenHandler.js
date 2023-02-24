@@ -1,9 +1,10 @@
 const JWT = require("jsonwebtoken");
 const User = require("../models/user");
 
-//クライアントから渡されたJWTが正常か検証
+//クライアントから渡されたトークンが正常かの検証
 const tokenDecode = (req) => {
   const bearerHeader = req.headers["authorization"];
+  console.log(bearerHeader);
 
   if (bearerHeader) {
     const bearer = bearerHeader.split(" ")[1];
@@ -18,18 +19,17 @@ const tokenDecode = (req) => {
   }
 };
 
-//JWT認証を検証するためのミドルウェア
+//トークン認証関数(ミドルウェアとして利用)
 exports.verifyToken = async (req, res, next) => {
   const tokenDecoded = tokenDecode(req);
+
   if (tokenDecoded) {
-    //そのJWTと一致するユーザーを探してくる
+    //そのトークンと一致するユーザーを探してくる。
     const user = await User.findById(tokenDecoded.id);
-    if (!user) {
-      return res.status(401).json("権限がありません");
-    }
+    if (!user) return res.status(401).json("権限がありません");
     req.user = user;
     next();
   } else {
-    return res.status(401).json("権限がありません");
+    res.status(401).json("権限がありません");
   }
 };

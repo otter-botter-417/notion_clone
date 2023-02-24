@@ -3,6 +3,7 @@ import axios from "axios";
 const BASE_URL = "http://localhost:5000/api/v1";
 const getToken = () => localStorage.getItem("token");
 
+//axiosのインスタンス化((前処理の共通化のため=全部JSON化しておく))
 const axiosClient = axios.create({
   baseURL: BASE_URL,
 });
@@ -11,18 +12,22 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(async (config) => {
   return {
     ...config,
-    header: {
+    headers: {
       "Content-Type": "application/json",
-      authrization: `Bearer ${getToken()}`, //リクエストヘッダにJWTをつけてサーバーに渡す
+      authorization: `Bearer ${getToken()}`, //リクエストヘッダにトークンを付けてサーバーに渡す
     },
   };
 });
 
 axiosClient.interceptors.response.use(
   (response) => {
-    return response.data;
+    if (response && response.data) return response.data;
+    return response;
   },
   (err) => {
+    if (!err.response) {
+      return alert(err);
+    }
     throw err.response;
   }
 );
