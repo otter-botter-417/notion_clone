@@ -8,16 +8,18 @@ import {
 import { Box } from "@mui/system";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import assets from "../../assets";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import memoApi from "../../api/memoApi";
 import { setMemo } from "../../redux/futures/memoSlice";
 
 const Sideber = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { memoId } = useParams();
   const user = useSelector((state) => state.user.value);
   const memos = useSelector((state) => state.memo.value);
 
@@ -29,17 +31,30 @@ const Sideber = () => {
   useEffect(() => {
     const getMemos = async () => {
       try {
-        console.log(1);
         const res = await memoApi.getAll();
-        console.log(res);
         dispatch(setMemo(res));
-        console.log(memos);
       } catch (error) {
         alert(error);
       }
     };
     getMemos();
-  }, []);
+  }, [dispatch]);
+  useEffect(() => {
+    const activeIndex = memos.findIndex((e) => e._id === memoId);
+    setActiveIndex(activeIndex);
+  }, [navigate]);
+
+  const addMemo = async () => {
+    try {
+      const res = await memoApi.create();
+      const newMemos = [res, ...memos];
+      dispatch(setMemo(newMemos));
+      navigate(`memo/${res._id}`);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   return (
     <Drawer
       container={window.document.body}
@@ -100,31 +115,23 @@ const Sideber = () => {
               プライベート
             </Typography>
             <IconButton>
-              <AddBoxOutlinedIcon />
+              <AddBoxOutlinedIcon onClick={() => addMemo()} />
             </IconButton>
           </Box>
         </ListItemButton>
-        <ListItemButton
-          sx={{ pl: "20px" }}
-          component={Link}
-          to="/memo/19284619ysa"
-        >
-          <Typography>✍仮置きのメモ</Typography>
-        </ListItemButton>
-        <ListItemButton
-          sx={{ pl: "20px" }}
-          component={Link}
-          to="/memo/19284619ysa"
-        >
-          <Typography>✍仮置きのメモ</Typography>
-        </ListItemButton>
-        <ListItemButton
-          sx={{ pl: "20px" }}
-          component={Link}
-          to="/memo/19284619ysa"
-        >
-          <Typography>✍仮置きのメモ</Typography>
-        </ListItemButton>
+        {memos.map((item, index) => (
+          <ListItemButton
+            sx={{ pl: "20px" }}
+            component={Link}
+            to={`/memo/${item._id}`}
+            key={item._id}
+            selected={index === activeIndex}
+          >
+            <Typography>
+              {item.icon} {item.title}
+            </Typography>
+          </ListItemButton>
+        ))}
       </List>
     </Drawer>
   );

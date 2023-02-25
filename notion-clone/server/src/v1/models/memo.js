@@ -15,7 +15,7 @@ const memoSchema = new Schema({
     type: String,
     default: "無題",
   },
-  dexcription: {
+  description: {
     type: String,
     default: "ここに自由に記入してください。",
   },
