@@ -4,7 +4,6 @@ const User = require("../models/user");
 //クライアントから渡されたトークンが正常かの検証
 const tokenDecode = (req) => {
   const bearerHeader = req.headers["authorization"];
-  console.log(bearerHeader);
 
   if (bearerHeader) {
     const bearer = bearerHeader.split(" ")[1];

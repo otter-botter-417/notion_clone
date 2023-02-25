@@ -101,7 +101,7 @@ export const Login = () => {
           ログイン
         </LoadingButton>
       </Box>
-      <Button component={Link} to="/login">
+      <Button component={Link} to="/register">
         アカウントを持っていませんか？新規登録
       </Button>
     </>
